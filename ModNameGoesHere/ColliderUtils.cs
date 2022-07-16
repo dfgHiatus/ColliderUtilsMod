@@ -49,7 +49,7 @@ namespace MeshColliderManagementTools
         public static ValueField<ColliderType> setColliderType;
         public static ReferenceField<Slot> ProcessRoot;
         public static ReferenceField<TextField> tag;
-        public static ReferenceField<Text> resultsText;
+        public static Text resultsText;
 
         // TODO Replace this with a dict.
         public static ValueField<string> setupBoundsType;
@@ -89,11 +89,20 @@ namespace MeshColliderManagementTools
             IgnoreUserHierarchies = Data.AddSlot("IgnoreUserHierarchies").AttachComponent<ValueField<bool>>();
             IgnoreUserHierarchies.Value.Value = true;
 
+            SetIgnoreRaycasts = Data.AddSlot("SetIgnoreRaycasts").AttachComponent<ValueField<bool>>();
+            SetIgnoreRaycasts.Value.Value = true;
+
+            SetCharacterCollider = Data.AddSlot("SetCharacterCollider").AttachComponent<ValueField<bool>>();
+            SetCharacterCollider.Value.Value = true;
+
             setupBoundsType = Data.AddSlot("setupBoundsType").AttachComponent<ValueField<string>>();
             setupBoundsType.Value.Value = SetupBoundsType["SetupFromLocalBounds"];
 
             useTagMode = Data.AddSlot("useTagMode").AttachComponent<ValueField<string>>();
             useTagMode.Value.Value = UseTagMode["IgnoreTag"];
+
+            setColliderType = Data.AddSlot("setColliderType").AttachComponent<ValueField<ColliderType>>();
+            setColliderType.Value.Value = ColliderType.Static;
 
             replacementColliderComponent = Data.AddSlot("replacementColliderType").AttachComponent<ValueField<string>>();
             replacementColliderComponent.Value.Value = ReplacementColliderComponent["BoxCollider"];
@@ -169,38 +178,29 @@ namespace MeshColliderManagementTools
             uIBuilder3.ColorMemberEditor(HighlightColor.Value);
             uIBuilder3.Spacer(24f);
 
-            UniLog.Log("6");
             // Controls for specific replacement collider settings.
             _text = "Replacement collider component:";
             uIBuilder3.Text(in _text);
             uIBuilder3.PrimitiveMemberEditor(replacementColliderComponent.Value);
-            UniLog.Log("6.1");
             _text = "Replacement setup action:";
             uIBuilder3.Text(in _text);
             uIBuilder3.PrimitiveMemberEditor(setupBoundsType.Value);
             uIBuilder3.Spacer(24f);
-            UniLog.Log("6.2");
             _text = "Preserve existing collider settings:";
             uIBuilder3.HorizontalElementWithLabel(in _text, 0.9f, () => uIBuilder3.BooleanMemberEditor(PreserveColliderSettings.Value));
-            UniLog.Log("6.3");
             _text = "Set collision Type:";
-            setColliderType.Value.Value = ColliderType.Static;
             uIBuilder3.Text(in _text);
             Slot _hideTextSlot = _layoutRoot.GetAllChildren().Last();
             uIBuilder3.EnumMemberEditor(setColliderType.Value);
             Slot _hideEnumSlot = _layoutRoot.GetAllChildren().Last().Parent.Parent;
-            UniLog.Log("6.4");
             _text = "Collider Mass:";
             Slot _hideFloatSlot = uIBuilder3.HorizontalElementWithLabel(in _text, 0.9f, () => uIBuilder3.PrimitiveMemberEditor(Mass.Value)).Slot.Parent;
-            UniLog.Log("6.5");
             _text = "Set CharacterCollider:";
             Slot _hideBoolSlot1 = uIBuilder3.HorizontalElementWithLabel(in _text, 0.9f, () => uIBuilder3.BooleanMemberEditor(SetCharacterCollider.Value)).Slot.Parent;
-            UniLog.Log("6.6");
             _text = "Set IgnoreRaycasts:";
             Slot _hideBoolSlot2 = uIBuilder3.HorizontalElementWithLabel(in _text, 0.9f, () => uIBuilder3.BooleanMemberEditor(SetIgnoreRaycasts.Value)).Slot.Parent;
             uIBuilder3.Spacer(24f);
 
-            UniLog.Log("7");
             // Hide some options if preserving existing settings.
             var _valCopy = _layoutRoot.AttachComponent<ValueCopy<bool>>();
             var _boolValDriver = _layoutRoot.AttachComponent<BooleanValueDriver<bool>>();
@@ -220,7 +220,6 @@ namespace MeshColliderManagementTools
             _valMultiDriver.Drives[3].Target = _hideBoolSlot2.ActiveSelf_Field;
             _valMultiDriver.Drives[4].Target = _hideFloatSlot.ActiveSelf_Field;
 
-            UniLog.Log("8");
             // Buttons for batch actions.
             _text = "List matching MeshColliders";
             uIBuilder3.Button(in _text).LocalPressed += PopulateList;
@@ -230,16 +229,14 @@ namespace MeshColliderManagementTools
             uIBuilder3.Button(in _text).LocalPressed += RemoveAll;
             uIBuilder3.Spacer(24f);
             _text = "------";
-            resultsText.Reference.Target = uIBuilder3.Text(in _text);
+            resultsText = uIBuilder3.Text(in _text);
 
-            UniLog.Log("9");
             // Build right hand side UI - list of found MeshColliders.
             UIBuilder uIBuilder4 = new UIBuilder(rectList[1].Slot);
             uIBuilder4.ScrollArea();
             uIBuilder4.VerticalLayout(10f, 4f);
             _scrollAreaRoot = uIBuilder4.FitContent(SizeFit.Disabled, SizeFit.MinSize).Slot;
 
-            UniLog.Log("10");
             // Prepare UIBuilder for addding elements to MeshCollider list.
             _listBuilder = uIBuilder4;
             _listBuilder.Style.MinHeight = 40f;
@@ -568,7 +565,7 @@ namespace MeshColliderManagementTools
 
         private void ShowResults(string results)
         {
-            resultsText.Reference.Target.Content.Value = results;
+            resultsText.Content.Value = results;
         }
     }
 }
