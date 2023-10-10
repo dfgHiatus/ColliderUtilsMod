@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FrooxEngine;
 using FrooxEngine.UIX;
-using BaseX;
+using Elements.Core;
 using HarmonyLib;
-using NeosModLoader;
+using ResoniteModLoader;
 using MeshColliderManagementTools;
 
 namespace ModNameGoesHere
 {
-    public class ColliderWizard : NeosMod
+    public class ColliderWizard : ResoniteMod
     {
         public override string Name => "ColliderUtilsMod";
         public override string Author => "dfgHiatus";
@@ -18,14 +18,13 @@ namespace ModNameGoesHere
         public override string Link => "https://github.com/dfgHiatus/ColliderUtilsMod";
         public override void OnEngineInit()
         {
-            Harmony harmony = new Harmony("net.dfgHiatus.ColliderUtilsMod");
-            harmony.PatchAll();
+            new Harmony("net.dfgHiatus.ColliderUtilsMod").PatchAll();
         }
 
-        [HarmonyPatch(typeof(NeosSwapCanvasPanel), "OnAttach")]
+        [HarmonyPatch(typeof(LegacySwapCanvasPanel), "OnAttach")]
         class DevCreateNewTesting
         {
-            public static void Postfix(NeosSwapCanvasPanel __instance)
+            public static void Postfix(LegacySwapCanvasPanel __instance)
             {
                 DevCreateNewForm createForm = __instance.Slot.GetComponent<DevCreateNewForm>();
                 if (createForm == null)
@@ -33,7 +32,7 @@ namespace ModNameGoesHere
                     return;
                 }
                 createForm.Slot.GetComponentInChildren<Canvas>().Size.Value = new float2(200f, 700f);
-                SyncRef<RectTransform> rectTransform = (SyncRef<RectTransform>)AccessTools.Field(typeof(NeosSwapCanvasPanel), "_currentPanel").GetValue(__instance);
+                SyncRef<RectTransform> rectTransform = (SyncRef<RectTransform>)AccessTools.Field(typeof(LegacySwapCanvasPanel), "_currentPanel").GetValue(__instance);
                 rectTransform.OnTargetChange += RectTransform_OnTargetChange;
             }
             static void RectTransform_OnTargetChange(SyncRef<RectTransform> reference)
@@ -64,7 +63,7 @@ namespace ModNameGoesHere
             }
             static void Button_LocalPressed(IButton button, ButtonEventData eventData)
             {
-                ColliderUtils col = new ColliderUtils();
+                new ColliderUtils();
                 button.Slot.GetObjectRoot().Destroy();
             }
         }
